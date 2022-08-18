@@ -41,7 +41,7 @@ pub fn generate() {
     let lmdb_h = match std::env::var("LMDB_H_PATH") {
         Ok(path) => PathBuf::from(path),
         Err(_) => match pkg_config::probe_library("lmdb") {
-            Ok(mut library) => library.include_paths.pop().unwrap(),
+            Ok(mut library) => library.include_paths.pop().unwrap().join("lmdb.h"),
             Err(_) => {
                 let lmdb = PathBuf::from(&env::var("CARGO_MANIFEST_DIR").unwrap());
                 lmdb.join("lmdb")

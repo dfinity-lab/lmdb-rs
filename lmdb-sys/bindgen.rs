@@ -94,5 +94,6 @@ pub fn generate() {
     if previous_contents != new_contents {
         // The bindings.rs were changed, update the original contents of src/bindings.rs
         fs::copy(out_bindings_path, src_bindings_path).expect("Unable to write new bindings.");
+        panic!("Changes in src/bindings.rs detected!");
     };
 }

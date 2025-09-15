@@ -1,6 +1,7 @@
 use bindgen::callbacks::IntKind;
 use bindgen::callbacks::ParseCallbacks;
 use std::env;
+use std::fs;
 use std::path::PathBuf;
 
 #[derive(Debug)]
@@ -52,6 +53,10 @@ pub fn generate() {
         },
     };
 
+    let src_bindings_path = PathBuf::from(&env::var("CARGO_MANIFEST_DIR").unwrap())
+        .join("src")
+        .join("bindings.rs");
+
     let out_bindings_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join("bindings.rs");
 
     let bindings = bindgen::Builder::default()
@@ -75,4 +80,19 @@ pub fn generate() {
     bindings
         .write_to_file(&out_bindings_path)
         .expect("Couldn't write bindings!");
+
+    let previous_contents = match fs::read(&src_bindings_path) {
+        Ok(s) => s,
+        Err(_) => vec![],
+    };
+
+    let new_contents = match fs::read(&out_bindings_path) {
+        Ok(s) => s,
+        Err(_) => vec![],
+    };
+
+    if previous_contents != new_contents {
+        // The bindings.rs were changed, update the original contents of src/bindings.rs
+        fs::copy(out_bindings_path, src_bindings_path).expect("Unable to write new bindings.");
+    };
 }

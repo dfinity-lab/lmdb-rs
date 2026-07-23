@@ -4,7 +4,7 @@ use ffi::*;
 
 bitflags! {
     #[doc="Environment options."]
-    #[derive(Default)]
+    #[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
     pub struct EnvironmentFlags: c_uint {
 
         #[doc="Use a fixed address for the mmap region. This flag must be specified"]

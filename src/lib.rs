@@ -14,17 +14,17 @@ extern crate tempfile;
 extern crate bitflags;
 
 pub use cursor::{Cursor, Iter, IterDup, RoCursor, RwCursor};
-pub use database::Database;
+pub use crate::database::Database;
 pub use environment::{Environment, EnvironmentBuilder, Info, Stat};
-pub use error::{Error, Result};
-pub use flags::*;
-pub use transaction::{InactiveTransaction, RoTransaction, RwTransaction, Transaction};
+pub use crate::error::{Error, Result};
+pub use crate::flags::*;
+pub use crate::transaction::{InactiveTransaction, RoTransaction, RwTransaction, Transaction};
 
 macro_rules! lmdb_try {
     ($expr:expr) => {{
         match $expr {
             ::ffi::MDB_SUCCESS => (),
-            err_code => return Err(::Error::from_err_code(err_code)),
+            err_code => return Err(crate::Error::from_err_code(err_code)),
         }
     }};
 }
@@ -35,7 +35,7 @@ macro_rules! lmdb_try_with_cleanup {
             ::ffi::MDB_SUCCESS => (),
             err_code => {
                 let _ = $cleanup;
-                return Err(::Error::from_err_code(err_code));
+                return Err(crate::Error::from_err_code(err_code));
             },
         }
     }};

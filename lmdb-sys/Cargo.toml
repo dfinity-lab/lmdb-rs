@@ -1,4 +1,5 @@
 [package]
+edition = "2024"
 name = "lmdb-rkv-sys"
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.11.99"

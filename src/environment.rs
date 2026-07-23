@@ -12,11 +12,11 @@ use ffi;
 
 use byteorder::{ByteOrder, NativeEndian};
 
-use cursor::Cursor;
-use database::Database;
-use error::{lmdb_result, Error, Result};
-use flags::{DatabaseFlags, EnvironmentFlags};
-use transaction::{RoTransaction, RwTransaction, Transaction};
+use crate::cursor::Cursor;
+use crate::database::Database;
+use crate::error::{lmdb_result, Result};
+use crate::flags::{DatabaseFlags, EnvironmentFlags};
+use crate::transaction::{RoTransaction, RwTransaction, Transaction};
 
 #[cfg(windows)]
 /// Adding a 'missing' trait from windows OsStrExt
@@ -159,7 +159,7 @@ impl Environment {
     /// Doing so can cause misbehavior from database corruption to errors like
     /// `Error::BadValSize` (since the DB name is gone).
     pub unsafe fn close_db(&mut self, db: Database) {
-        ffi::mdb_dbi_close(self.env, db.dbi());
+        unsafe { ffi::mdb_dbi_close(self.env, db.dbi()) };
     }
 
     /// Retrieves statistics about this environment.
@@ -212,7 +212,7 @@ impl Environment {
         for result in cursor.iter() {
             let (_key, value) = result?;
             if value.len() < mem::size_of::<size_t>() {
-                return Err(Error::Corrupted);
+                return Err(crate::Error::Corrupted);
             }
 
             let s = &value[..mem::size_of::<size_t>()];
@@ -399,7 +399,7 @@ impl EnvironmentBuilder {
             }
             let path = match CString::new(path.as_os_str().as_bytes()) {
                 Ok(path) => path,
-                Err(..) => return Err(::Error::Invalid),
+                Err(..) => return Err(crate::Error::Invalid),
             };
             lmdb_try_with_cleanup!(
                 ffi::mdb_env_open(env, path.as_ptr(), self.flags.bits(), mode),

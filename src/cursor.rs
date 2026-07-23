@@ -3,11 +3,11 @@ use std::{fmt, mem, ptr, result, slice};
 
 use libc::{c_uint, c_void, size_t, EINVAL};
 
-use database::Database;
-use error::{lmdb_result, Error, Result};
+use crate::database::Database;
+use crate::error::{lmdb_result, Error, Result};
 use ffi;
-use flags::WriteFlags;
-use transaction::Transaction;
+use crate::flags::WriteFlags;
+use crate::transaction::Transaction;
 
 /// An LMDB cursor.
 pub trait Cursor<'txn> {
@@ -242,7 +242,7 @@ unsafe fn slice_to_val(slice: Option<&[u8]>) -> ffi::MDB_val {
 }
 
 unsafe fn val_to_slice<'a>(val: ffi::MDB_val) -> &'a [u8] {
-    slice::from_raw_parts(val.mv_data as *const u8, val.mv_size as usize)
+    unsafe { slice::from_raw_parts(val.mv_data as *const u8, val.mv_size as usize) }
 }
 
 /// An iterator over the key/value pairs in an LMDB database.
@@ -410,7 +410,7 @@ mod test {
     use super::*;
     use environment::*;
     use ffi::*;
-    use flags::*;
+    use crate::flags::*;
 
     #[test]
     fn test_get() {

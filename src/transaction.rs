@@ -4,11 +4,11 @@ use std::{fmt, mem, ptr, result, slice};
 
 use ffi;
 
-use cursor::{RoCursor, RwCursor};
-use database::Database;
-use environment::{Environment, Stat};
-use error::{lmdb_result, Error, Result};
-use flags::{DatabaseFlags, EnvironmentFlags, WriteFlags};
+use crate::cursor::{RoCursor, RwCursor};
+use crate::database::Database;
+use crate::environment::{Environment, Stat};
+use crate::error::{lmdb_result, Error, Result};
+use crate::flags::{DatabaseFlags, EnvironmentFlags, WriteFlags};
 
 /// An LMDB transaction.
 ///
@@ -56,7 +56,7 @@ pub trait Transaction: Sized {
     /// transaction which uses this function must finish (either commit or
     /// abort) before any other transaction may use this function.
     unsafe fn open_db(&self, name: Option<&str>) -> Result<Database> {
-        Database::new(self.txn(), name, 0)
+        unsafe { Database::new(self.txn(), name, 0) }
     }
 
     /// Gets an item from a database.
@@ -262,7 +262,7 @@ impl<'env> RwTransaction<'env> {
     /// transaction which uses this function must finish (either commit or
     /// abort) before any other transaction may use this function.
     pub unsafe fn create_db(&self, name: Option<&str>, flags: DatabaseFlags) -> Result<Database> {
-        Database::new(self.txn(), name, flags.bits() | ffi::MDB_CREATE)
+        unsafe { Database::new(self.txn(), name, flags.bits() | ffi::MDB_CREATE) }
     }
 
     /// Opens a new read-write cursor on the given database and transaction.
@@ -371,7 +371,7 @@ impl<'env> RwTransaction<'env> {
     /// This method is unsafe in the same ways as `Environment::close_db`, and
     /// should be used accordingly.
     pub unsafe fn drop_db(&mut self, db: Database) -> Result<()> {
-        lmdb_result(ffi::mdb_drop(self.txn, db.dbi(), 1))
+        unsafe { lmdb_result(ffi::mdb_drop(self.txn, db.dbi(), 1)) }
     }
 
     /// Begins a new nested transaction inside of this transaction.
@@ -404,9 +404,9 @@ mod test {
     use tempfile::Builder;
 
     use super::*;
-    use cursor::Cursor;
-    use error::*;
-    use flags::*;
+    use crate::cursor::Cursor;
+    use crate::error::*;
+    use crate::flags::*;
 
     #[test]
     fn test_put_get_del() {

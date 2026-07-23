@@ -4,7 +4,7 @@ use std::ptr;
 
 use ffi;
 
-use error::{
+use crate::error::{
     lmdb_result,
     Result,
 };
@@ -30,7 +30,7 @@ impl Database {
             ptr::null()
         };
         let mut dbi: ffi::MDB_dbi = 0;
-        lmdb_result(ffi::mdb_dbi_open(txn, name_ptr, flags, &mut dbi))?;
+        lmdb_result(unsafe { ffi::mdb_dbi_open(txn, name_ptr, flags, &mut dbi) })?;
         Ok(Database {
             dbi,
         })

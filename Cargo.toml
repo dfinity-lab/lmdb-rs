@@ -1,5 +1,6 @@
 [package]
 name = "lmdb-rkv"
+edition = { workspace = true }
 # NB: When modifying, also modify html_root_url in lib.rs
 version = "0.14.99"
 authors = ["Dan Burkert <dan@danburkert.com>", "Victor Porof <vporof@mozilla.com>"]
@@ -31,6 +32,9 @@ appveyor = { repository = "mozilla/lmdb-rs" }
 members = [
   "lmdb-sys",
 ]
+
+[workspace.package]
+edition = "2024"
 
 [dependencies]
 bitflags = "1"
